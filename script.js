@@ -1,75 +1,62 @@
-/*
-const mymap = L.map('map').setView([0, 0], 1);
-const attribution =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const mymap = L.map('map', {
+      center: [0,0],
+      zoom: 3,
+      gestureHandling: true,
+      
+    })
+    const attribution =
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const tiles = L.tileLayer(tileUrl, { attribution });
-tiles.addTo(mymap);
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const tiles = L.tileLayer(tileUrl, { 
+      attribution,
+      scrollWheelZoom: false 
+    });
+    tiles.addTo(mymap);
 
-const issIcon = L.icon({
-  iconUrl: 'iss.svg',
-  iconSize: [50, 32],
-  iconAnchor: [25, 16]
-});
-const marker = L.marker([0, 0], { icon: issIcon }).addTo(mymap);
+    const issIcon = L.icon({
+      iconUrl: '/media/iss.svg',
+      iconSize: [100, 100],
+      iconAnchor: [50, 50]
+    });
+    const marker = L.marker([0, 0], { 
+      icon: issIcon
+      }).addTo(mymap);
+    
+    marker.bindTooltip("<b>International Space Station</b>");
 
+    const api_url = 'https://api.wheretheiss.at/v1/satellites/25544?units=miles';
 
-const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+    let firstTime = true;
 
-let firstTime = true;
+    async function getData() {
+      const res = await fetch(api_url);
+      const data = await res.json();
+      const { timestamp, altitude, velocity, latitude, longitude, visibility } = data;
 
-async function getISS() {
-  const response = await fetch(api_url);
-  const data = await response.json();
-  const { latitude, longitude } = data;
+      marker.setLatLng([latitude, longitude]);
+      if (firstTime) {
+        mymap.setView([latitude, longitude], 3);
+        firstTime = false;
+      }
+      const date = new Date();
+      //console.log(new Date(timestamp).toLocaleString())
+      document.getElementById('time').textContent = date.toTimeString();
+      document.getElementById('alt').textContent = altitude.toFixed(2);
+      document.getElementById('vel').textContent = velocity.toFixed(2);
+      document.getElementById('lat').textContent = latitude.toFixed(2);
+      document.getElementById('lon').textContent = longitude.toFixed(2);
+      
+      if(visibility == 'daylight'){
+        document.getElementById('vis').textContent = 'The ISS is in daylight'
+        document.getElementById('visibility').classList.add("daylight")
+      } else if(visibility == 'eclipsed'){
+        document.getElementById('vis').textContent = "The ISS is under Earth's shadow"
+        document.getElementById('visibility').classList.add("eclipsed")
+      }
 
-  marker.setLatLng([latitude, longitude]);
-  if (firstTime) {
-    mymap.setView([latitude, longitude], 2);
-    firstTime = false;
-  }
-  document.getElementById('lat').textContent = latitude.toFixed(2);
-  document.getElementById('lon').textContent = longitude.toFixed(2);
-}
+    }
 
-getISS();
-setInterval(getISS, 1000);
-*/
+    getData();
 
-const mymap = L.map('map').setView([0, 0], 5);
-const attribution =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
-const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const tiles = L.tileLayer(tileUrl, { attribution });
-tiles.addTo(mymap);
-
-const issIcon = L.icon({
-  iconUrl: 'iss.svg',
-  iconSize: [150, 132],
-  iconAnchor: [25, 16]
-});
-const marker = L.marker([0, 0], { icon: issIcon }).addTo(mymap);
-
-const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
-
-let firstTime = true;
-
-async function getISS() {
-  const res = await fetch(api_url);
-  const data = await res.json();
-  const { latitude, longitude } = data;
-
-  marker.setLatLng([latitude, longitude]);
-  if (firstTime) {
-    mymap.setView([latitude, longitude], 5);
-    firstTime = false;
-  }
-  document.getElementById('lat').textContent = latitude.toFixed(2);
-  document.getElementById('lon').textContent = longitude.toFixed(2);
-}
-
-getISS();
-
-setInterval(getISS, 1000);
+    setInterval(getData, 1500);
