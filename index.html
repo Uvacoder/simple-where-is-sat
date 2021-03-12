@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="style.css">
+	<meta name="author" content="Giridhar">
+	<meta name="description" content="A simple website to track the position of International Space Station">
+	<meta name="keywords" content="ISS, International Space Station, Satellite, live location, ISS position, current position of ISS, ISS API, Track the ISS">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+	 crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+	 crossorigin="">
+	</script>
+	<link rel="stylesheet" href="css/leaflet-gesture-handling.min.css" type="text/css">
+	<script src="js/leaflet-gesture-handling.min.js">
+	</script>
+	<style>
+		#map {
+			height: 100%;
+			width: 100%;
+		}
+	</style>
+	<title>where is ISS?</title>
+</head>
+
+<body>
+
+	<p>
+		latitude: <span id="lat"></span>°<br />
+    longitude: <span id="lon"></span>°
+  </p>
+  <div class="container">
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+    <div class="info-container">
+      <p><span class="time">time</span></p>
+      <p><span class="altitude">altitude</span></p>
+      <p><span class="velocity">velocity</span></p>
+      <p><span class="latitude">latitude</span></p>
+      <p><span class="longitude">longitude</span></p>
+      <p><span class="visibility">visibility</span></p>
+    </div>
+  </div>
+
+    
+  <script>
+    
+    const mymap = L.map('map', {
+      gestureHandling: true,
+      gestureHandlingOptions: {
+        text: {
+            touch: "Hey bro, use two fingers to move the map",
+            scroll: "Hey bro, use ctrl + scroll to zoom the map",
+            scrollMac: "Hey bro, use \u2318 + scroll to zoom the map"
+        }
+    }
+    }).setView([0, 0], 3);
+    const attribution =
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const tiles = L.tileLayer(tileUrl, { 
+      attribution,
+      scrollWheelZoom: false 
+    });
+    tiles.addTo(mymap);
+
+    const issIcon = L.icon({
+      iconUrl: 'iss.svg',
+      iconSize: [50, 50],
+      iconAnchor: [25, 25]
+    });
+    const marker = L.marker([0, 0], { 
+      icon: issIcon
+      }).addTo(mymap);
+    
+    marker.bindTooltip("<b>International Space Station</b>");
+
+    const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+    let firstTime = true;
+
+    async function getData() {
+      const res = await fetch(api_url);
+      const data = await res.json();
+      const { latitude, longitude, timestamp, visibility, velocity, altitude } = data;
+
+      marker.setLatLng([latitude, longitude]);
+      if (firstTime) {
+        mymap.setView([latitude, longitude], 3);
+        firstTime = false;
+      }
+      document.getElementById('lat').textContent = latitude.toFixed(2);
+      document.getElementById('lon').textContent = longitude.toFixed(2);
+      //console.log(new Date(timestamp).toLocaleString())
+    }
+
+    getData();
+
+    //setInterval(getData, 1500);
+
+  </script>
+  </body>
+</html>
