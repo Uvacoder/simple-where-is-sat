@@ -8,7 +8,7 @@
     "dev": "nodemon index.js"
   },
   "keywords": [
-    "ISS",
+    "ISS", "wheretheissat",
     "International Space Station",
     "Satellite",
     "live location",
