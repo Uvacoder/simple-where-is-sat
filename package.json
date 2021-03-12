@@ -1,0 +1,28 @@
+{
+  "name": "where-is-ISS",
+  "version": "1.0.0",
+  "description": "A simple website to track the position of International Space Station",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "ISS",
+    "International Space Station",
+    "Satellite",
+    "live location",
+    "ISS position",
+    "current position of ISS",
+    "ISS API",
+    "Track the ISS"
+  ],
+  "author": "Giridhar",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
