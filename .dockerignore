@@ -1,5 +1,6 @@
 Dockerfile
 .dockerignore
 .gitignore
+docker-compose*
 node_modules
 README.md
