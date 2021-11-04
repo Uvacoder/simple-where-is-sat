@@ -1,6 +1,8 @@
-FROM node:14
+FROM node:14-alpine
 
-WORKDIR /app
+EXPOSE ${PORT}
+
+WORKDIR /usr/src/app
 
 COPY package.json ./
 
@@ -8,6 +10,10 @@ RUN npm install
 
 COPY . .
 
-EXPOSE ${PORT}
+RUN adduser -D appuser
 
-CMD [ "node", "index.js" ]
+RUN chown -v appuser /usr/src/app
+
+USER appuser
+
+CMD ["npm", "start"]
